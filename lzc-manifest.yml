@@ -22,7 +22,7 @@ application:
 
 services:
   romm:
-    image: registry.lazycat.cloud/u30266047/rommapp/romm:15f27acb76dfec76
+    image: rommapp/romm:4.9.0
     depends_on:
       - db
     setup_script: |
@@ -71,7 +71,7 @@ services:
       start_period: 90s
 
   db:
-    image: registry.lazycat.cloud/u30266047/library/mariadb:1f97568b57277cf6
+    image: mariadb:11.3.2
     binds:
       - /lzcapp/var/mysql:/var/lib/mysql
     environment:
