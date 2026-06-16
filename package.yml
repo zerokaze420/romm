@@ -1,0 +1,18 @@
+package: cloud.lazycat.app.romm
+version: 4.9.0-lzc.6
+name: RomM
+description: A self-hosted ROM manager and browser player.
+author: RomM
+license: AGPL-3.0-only
+homepage: https://romm.app/
+min_os_version: 1.5.0
+locales:
+  zh-CN:
+    name: RomM
+    description: 自托管 ROM 管理器和浏览器游戏播放器。
+  en-US:
+    name: RomM
+    description: A self-hosted ROM manager and browser player.
+permissions:
+  required:
+    - net.internet

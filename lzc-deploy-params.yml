@@ -1,0 +1,45 @@
+params:
+  - id: db_password
+    type: secret
+    name: Database password
+    description: Password used by RomM to connect to MariaDB.
+    default_value: $random(len=32)
+    hidden: true
+  - id: db_root_password
+    type: secret
+    name: Database root password
+    description: Root password for the bundled MariaDB service.
+    default_value: $random(len=32)
+    hidden: true
+  - id: romm_auth_secret_key
+    type: secret
+    name: RomM auth secret key
+    description: Secret key used to sign RomM authentication sessions.
+    default_value: $random(len=64)
+    hidden: true
+  - id: hasheous_api_enabled
+    type: bool
+    name: Enable Hasheous metadata
+    description: Use Hasheous as an additional metadata provider.
+    default_value: "true"
+    optional: true
+  - id: screenscraper_user
+    type: string
+    name: Screenscraper user
+    description: Optional Screenscraper username for metadata scans.
+    optional: true
+  - id: screenscraper_password
+    type: secret
+    name: Screenscraper password
+    description: Optional Screenscraper password for metadata scans.
+    optional: true
+  - id: retroachievements_api_key
+    type: secret
+    name: RetroAchievements API key
+    description: Optional API key for RetroAchievements integration.
+    optional: true
+  - id: steamgriddb_api_key
+    type: secret
+    name: SteamGridDB API key
+    description: Optional API key for SteamGridDB artwork.
+    optional: true

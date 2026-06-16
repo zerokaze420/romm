@@ -1,0 +1,91 @@
+application:
+  subdomain: romm
+  background_task: true
+  oidc_redirect_path: /api/oauth/openid
+  public_path:
+    - /api/heartbeat
+    - /api/login/openid
+    - /api/oauth/openid
+    - /assets/*
+    - /site.webmanifest
+    - /favicon.ico
+    - /favicon.svg
+  injects:
+    - id: lazycat-file-chooser
+      on: browser
+      when:
+        - /*
+      do:
+        - src: file:///lzcapp/pkg/content/lazycat-injects/lzc-file-chooser-inject.js
+  routes:
+    - /=http://romm.cloud.lazycat.app.romm.lzcapp:8080
+
+services:
+  romm:
+    image: registry.lazycat.cloud/u30266047/rommapp/romm:15f27acb76dfec76
+    depends_on:
+      - db
+    setup_script: |
+      mkdir -p /romm/library/roms
+    binds:
+      - /lzcapp/var/romm:/romm
+      - /lzcapp/var/redis-data:/redis-data
+    environment:
+      - DB_HOST=db.cloud.lazycat.app.romm.lzcapp
+      - DB_PORT=3306
+      - DB_NAME=romm
+      - DB_USER=romm
+      - DB_PASSWD={{ .U.db_password }}
+      - ROMM_AUTH_SECRET_KEY={{ .U.romm_auth_secret_key }}
+      - ROMM_BASE_URL=https://${LAZYCAT_APP_DOMAIN}
+      - ROMM_BASE_PATH=/romm
+      - ROMM_PORT=8080
+      - OIDC_ENABLED=true
+      - OIDC_AUTOLOGIN=false
+      - OIDC_PROVIDER=LazyCat
+      - OIDC_CLIENT_ID=${LAZYCAT_AUTH_OIDC_CLIENT_ID}
+      - OIDC_CLIENT_SECRET=${LAZYCAT_AUTH_OIDC_CLIENT_SECRET}
+      - OIDC_REDIRECT_URI=https://${LAZYCAT_APP_DOMAIN}/api/oauth/openid
+      - OIDC_SERVER_APPLICATION_URL=${LAZYCAT_AUTH_OIDC_ISSUER_URI}
+      - OIDC_SERVER_METADATA_URL=${LAZYCAT_AUTH_OIDC_ISSUER_URI}/.well-known/openid-configuration
+      - OIDC_CLAIM_ROLES=groups
+      - OIDC_ROLE_ADMIN=ADMIN
+      - OIDC_ROLE_VIEWER=*
+      - OIDC_USERNAME_ATTRIBUTE=preferred_username
+      - DISABLE_USERPASS_LOGIN=true
+      - HASHEOUS_API_ENABLED={{ or .U.hasheous_api_enabled "true" }}
+      - SCREENSCRAPER_USER={{ or .U.screenscraper_user "" }}
+      - SCREENSCRAPER_PASSWORD={{ or .U.screenscraper_password "" }}
+      - RETROACHIEVEMENTS_API_KEY={{ or .U.retroachievements_api_key "" }}
+      - STEAMGRIDDB_API_KEY={{ or .U.steamgriddb_api_key "" }}
+      - LOGLEVEL=INFO
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - -qO-
+        - http://127.0.0.1:8080/
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 90s
+
+  db:
+    image: registry.lazycat.cloud/u30266047/library/mariadb:1f97568b57277cf6
+    binds:
+      - /lzcapp/var/mysql:/var/lib/mysql
+    environment:
+      - MARIADB_ROOT_PASSWORD={{ .U.db_root_password }}
+      - MARIADB_DATABASE=romm
+      - MARIADB_USER=romm
+      - MARIADB_PASSWORD={{ .U.db_password }}
+    healthcheck:
+      test:
+        - CMD
+        - healthcheck.sh
+        - --connect
+        - --innodb_initialized
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
